@@ -54,6 +54,12 @@ rules:
   - apiGroups: ["apiextensions.k8s.io"]
     resources: ["customresourcedefinitions"]
     verbs: ["create", "list", "watch", "delete", "get", "update"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["csinodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]    
 
 ---
 kind: ClusterRoleBinding
@@ -64,7 +70,7 @@ subjects:
   - kind: ServiceAccount
     name: csi-snapshotter
     # replace with non-default namespace name
-    namespace: default
+    namespace: kube-system
 roleRef:
   kind: ClusterRole
   # change the name also here if the ClusterRole gets renamed
@@ -75,7 +81,7 @@ roleRef:
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  namespace: default # TODO: replace with the namespace you want for your sidecar
+  namespace: kube-system # TODO: replace with the namespace you want for your sidecar
   name: external-snapshotter-leaderelection
 rules:
 - apiGroups: ["coordination.k8s.io"]
@@ -87,11 +93,11 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: external-snapshotter-leaderelection
-  namespace: default # TODO: replace with the namespace you want for your sidecar
+  namespace: kube-system # TODO: replace with the namespace you want for your sidecar
 subjects:
   - kind: ServiceAccount
     name: csi-snapshotter
-    namespace: default # TODO: replace with the namespace you want for your sidecar
+    namespace: kube-system # TODO: replace with the namespace you want for your sidecar
 roleRef:
   kind: Role
   name: external-snapshotter-leaderelection
